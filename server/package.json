@@ -1,0 +1,27 @@
+{
+    "name": "server",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "nodemon ./src/index.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@types/node": "^22.13.10",
+        "@types/uuid": "^10.0.0",
+        "apollo-server": "^3.13.0",
+        "apollo-server-express": "^3.13.0",
+        "cors": "^2.8.5",
+        "express": "^4.21.2",
+        "graphql": "^16.10.0",
+        "uuid": "^11.1.0"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.0",
+        "nodemon": "^3.1.9"
+    }
+}
