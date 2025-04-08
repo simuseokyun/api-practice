@@ -7,22 +7,23 @@ const basePath = resolve();
 // 현재 작업 디렉토리는 터미널에 npm start가 실행되는 곳이다. 혼동하지 말 것
 
 const filenames = {
-    messages: resolve(basePath, 'src/db/messages.json'),
-    users: resolve(basePath, 'src/db/users.json'),
+  messages: resolve(basePath, 'src/db/messages.json'),
+  users: resolve(basePath, 'src/db/users.json'),
 };
 
 export const readDB = (target) => {
-    try {
-        return JSON.parse(fs.readFileSync(filenames[target], 'utf-8')); // utf-8 은 인코딩 방식, readFileSync는 동기적으로 실행된다. 초기 설정에 주로 사용
-    } catch (err) {
-        console.error(err);
-    }
+  try {
+    return JSON.parse(fs.readFileSync(filenames[target], 'utf-8')); // utf-8 은 인코딩 방식,
+    // readFileSync는 동기적으로 실행된다. 초기 설정에 주로 사용
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 export const writeDB = (target, data) => {
-    try {
-        return fs.writeFileSync(filenames[target], JSON.stringify(data)); // db에 값을 추가하는 것이므로 JSON형태로 보내줘야 한다.
-    } catch (err) {
-        console.error(err);
-    }
+  try {
+    return fs.writeFileSync(filenames[target], JSON.stringify(data)); // db에 값을 추가하는 것이므로 JSON형태로 보내줘야 한다.
+  } catch (err) {
+    console.error(err);
+  }
 };

@@ -1,4 +1,8 @@
 {
-    "roy": { "id": "roy", "nickname": "로아" },
-    "jay": { "id": "jay", "nickname": "제이" }
+  "roy": { "id": "roy", "nickname": "로아" },
+  "jay": { "id": "jay", "nickname": "제이" },
+  "sdsd": { "id": "sdsd", "nickname": "sdsd" },
+  "simseokyun": { "id": "simseokyun", "nickname": "심현석" },
+  "ggg": { "id": "ggg", "nickname": "ff" },
+  "dd": { "id": "dd", "nickname": "dd" }
 }

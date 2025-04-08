@@ -6,28 +6,29 @@ import { readDB } from './dbController.js';
 import schema from './schema/index.js';
 
 (async () => {
-    const server = new ApolloServer({
-        typeDefs: schema,
-        resolvers,
-        context: {
-            db: {
-                messages: readDB('messages'),
-                users: readDB('users'),
-            },
+  const server = new ApolloServer({
+    typeDefs: schema,
+    resolvers,
+    context: () => {
+      return {
+        db: {
+          messages: readDB('messages'), // 요청마다 새로 읽음
+          users: readDB('users'),
         },
-    });
+      };
+    },
+  });
 
-    const app = express();
-    await server.start();
-    server.applyMiddleware({
-        app,
-        path: '/graphql',
-        cors: {
-            origin: ['http://localhost:3000', 'https://studio.apollographql.com'],
-            credentials: true,
-        },
-    });
+  const app = express();
+  await server.start();
+  server.applyMiddleware({
+    app,
+    path: '/graphql', // 엔드포인트가 하나임
+    cors: {
+      origin: ['http://localhost:3000', 'https://studio.apollographql.com'],
+      credentials: true,
+    },
+  });
 
-    app.listen({ port: 8000 });
-    console.log('server listening on 8000...');
+  app.listen({ port: 8000 }, () => console.log('server 8000...'));
 })();
