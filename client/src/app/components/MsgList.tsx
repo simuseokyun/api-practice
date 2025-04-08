@@ -6,7 +6,7 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
-import { useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import fetcher from '../queryClient.js';
 import {
   CREATE_MESSAGE,
@@ -19,8 +19,8 @@ import MsgInput from './MsgInput.tsx';
 import { MsgQueryData, Messages } from '../types.ts';
 import { useSearchParams } from 'next/navigation';
 import useInfiniteScroll from '../hooks/useInfiniteScroll.ts';
-import { useEffect, useState } from 'react';
 import { GET_USERS } from '../graphql/users.ts';
+import Link from 'next/link';
 
 export function MsgList() {
   const fetchMoreEl = useRef(null);
@@ -41,10 +41,12 @@ export function MsgList() {
     string
   >({
     queryKey: ['messages'],
-    queryFn: ({ queryKey, pageParam = '' }) =>
+    queryFn: ({ pageParam = '' }) =>
+      // 기본적으로 queryFn에는 queryKey를 받을 수 있고 infiniteQuery인경경우 pageParam을 받을 수 있다
       fetcher(GET_MESSAGES, { cursor: pageParam }),
     initialPageParam: '',
     getNextPageParam: ({ messages }) => {
+      // getNextPageParam의 매개변수로는 queryFn의 출력값이 들어온다. 즉 메시지 15개
       return messages[messages.length - 1]?.id;
     },
     staleTime: 60 * 1000,
@@ -54,13 +56,20 @@ export function MsgList() {
   const { data: users } = useQuery({
     queryKey: ['users'],
     queryFn: () => fetcher(GET_USERS),
+    staleTime: 60 * 1000,
+    gcTime: 300 * 1000,
   });
 
   const userId = useSearchParams().get('userId') || undefined;
+  const login =
+    userId &&
+    users?.users.find((u: { id: string; nickname: string }) => u.id === userId);
 
   const { mutate: onCreate } = useMutation({
-    mutationFn: ({ text }: { text: string }) =>
-      fetcher(CREATE_MESSAGE, { text, userId }),
+    mutationFn: ({ text }: { text: string }) => {
+      if (!userId) throw new Error('아이디 없음');
+      return fetcher(CREATE_MESSAGE, { text, userId });
+    },
     onSuccess: ({ createMessage }) => {
       queryClient.setQueryData<MsgQueryData>(['messages'], (prev) => {
         if (!prev) return;
@@ -87,7 +96,6 @@ export function MsgList() {
     onError: (err) => {
       console.log(err);
     },
-    onSettled: () => {},
   });
 
   const { mutate: onUpdate } = useMutation({
@@ -102,7 +110,6 @@ export function MsgList() {
         const deepFindIndex = prev.pages[findIndex].messages.findIndex(
           (a) => a.id === updateMessage.id
         );
-
         // findIndex만 구해서 이전 값 복사 후 그 자리값만 바꿔주면 된다
         const newPages = [...prev.pages];
         newPages[findIndex].messages[deepFindIndex] = updateMessage;
@@ -120,12 +127,14 @@ export function MsgList() {
   });
 
   const { mutate: onDelete } = useMutation({
-    mutationFn: ({ id }: { id: string }) =>
-      fetcher(DELETE_MESSAGE, { id, userId }),
+    mutationFn: ({ id }: { id: string }) => {
+      if (!userId) throw new Error('에러');
+      return fetcher(DELETE_MESSAGE, { id, userId });
+    },
     onSuccess: ({ deleteMessage }) => {
       queryClient.setQueryData<MsgQueryData>(['messages'], (prev) => {
         if (!prev) return { pages: [{ messages: [] }], pageParams: [] };
-        console.log(prev);
+
         const findIndex = prev.pages.findIndex((page) => {
           return page.messages.some((m) => m.id === deleteMessage);
         });
@@ -153,8 +162,9 @@ export function MsgList() {
   }, [intersecting, fetchNextPage, hasNextPage, isFetching]);
   return (
     <div className="w-[800px] mt-[30px]">
+      <Link href="/signUp">회원가입</Link>
       <h1 className="text-2xl m-5">Welcome</h1>
-      {userId && <MsgInput mutate={onCreate} />}
+      {!!login && <MsgInput mutate={onCreate} />}
       <ul>
         {messages?.pages.map((page) =>
           page?.messages.map((m) => {

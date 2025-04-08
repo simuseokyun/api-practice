@@ -1,13 +1,16 @@
 import './globals.css';
+import Provider from './components/queryClient';
+import { ReactNode } from 'react';
 
-export default function RootLayout({
-    children,
-}: Readonly<{
-    children: React.ReactNode;
-}>) {
-    return (
-        <html lang="en">
-            <body>{children}</body>
-        </html>
-    );
+interface RootProps {
+  children: ReactNode;
+}
+export default function RootLayout({ children }: RootProps) {
+  return (
+    <html lang="en">
+      <body>
+        <Provider>{children}</Provider>
+      </body>
+    </html>
+  );
 }

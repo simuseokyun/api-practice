@@ -1,5 +1,5 @@
-import { Mutate, Mutate2, User } from '../types';
-import { MouseEvent } from 'react';
+import { Mutate, MutateDelete } from '../types';
+
 import MsgInput from './MsgInput';
 interface Props {
   id: string;
@@ -10,7 +10,7 @@ interface Props {
   isSetting: string | null;
   onSetting: () => void;
   onUpdate: Mutate;
-  onDelete: Mutate2;
+  onDelete: MutateDelete;
   user: { id: string; nickname: string };
 }
 
@@ -33,7 +33,7 @@ export function MsgItem({
     <li className="messages__item p-4 border mt-2">
       <div className="flex justify-between">
         <h3 className="text-base flex flex-row items-center">
-          {user.nickname}
+          {user?.nickname}
           <span className="text-xs ml-4">
             {new Date(timeStamp).toLocaleString('ko-KR', {
               year: 'numeric',
